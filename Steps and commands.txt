@@ -1,9 +1,9 @@
-Connections:
-Fingerprint Module		USB Module
-VCC RED 			CONNECT TO USB TTL (5V)
-GND BLACK			CONNECT TO USB TTL
-TX YELLOW			CONNECT TO USB TTL RX
-RX WHITE 			CONNECT TO USB TTL TX
+Practical 10 : Fingerprint
+GPIO 
+VCC RED - CONNECT TO USB TTL (5V)
+GND BLACK - CONNECT TO USB TTL
+TX YELLOW - CONNECT TO USB TTL RX
+RX WHITE - CONNECT TO USB TTL TX
 
 #pip3 install pyfingerprint
 Create a new file finger.py in pyfingerprint directory
@@ -89,11 +89,11 @@ def deleteFinger():
             	return False
         else:
 	if(f.deleteTemplate(positionNumber)==True):
-            			print('Finger Deleted')
+            	print('Finger Deleted')
            	
 time.sleep(4)
             	return True
-	except Exception as e:
+    except Exception as e:
             print('Operation failed')
             print('Exception message: ' +str(e))
             exit(1)
@@ -103,15 +103,15 @@ time.sleep(1)
  
 print('Start') 
 while True:
-	i = int(input("\nEnter :\n1.Enroll\n2.Search\n3.Delete\n4.Exit\n"));
+    	i = int(input("\nEnter :\n1.Enroll\n2.Search\n3.Delete\n4.Exit\n"));
     	if i==1:
-		enrollFinger()
+        		enrollFinger()
     	elif i==2:
-        	searchFinger()
+        		searchFinger()
     	elif i==3:
-        	deleteFinger()
+        		deleteFinger()
     	elif i==4:
 		break
     	else:
-		print("Invalid option !!!Enter Correct")
-
+        		print("Invalid option !!!Enter Correct")
+#fingerprint program ends
