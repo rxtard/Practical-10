@@ -1,117 +1,108 @@
-Practical 10 : Fingerprint
-GPIO 
-VCC RED - CONNECT TO USB TTL (5V)
-GND BLACK - CONNECT TO USB TTL
-TX YELLOW - CONNECT TO USB TTL RX
-RX WHITE - CONNECT TO USB TTL TX
+PRACTICAL 10: FINGERPRINT SENSOR
+Fingerprint → USB-TTL → Raspberry Pi
 
-#pip3 install pyfingerprint
-Create a new file finger.py in pyfingerprint directory
- 
-#fingerprint program starts
-import time 
-from pyfingerprint. pyfingerprint import PyFingerprint 
-import RPi.GPIO as gpio 
-print("Successfully imported fingerprint module" )
-gpio.setwarnings(False) 
-gpio.setmode(gpio.BCM) 
+VCC (Red)   → VCC (5V)
+GND (Black) → GND
+TX  (Yellow) → RX (USB-TTL)
+RX  (White)  → TX (USB-TTL)
+
+USB-TTL → USB port of Raspberry Pi
+
+- Commands -> 
+pip3 install pyfingerprint
+
+ls /dev/ttyUSB*
+
+sudo nano finger.py
+
+python3 finger.py
+
+CODE:
+# fingerprint program starts
+
+import time
+from pyfingerprint.pyfingerprint import PyFingerprint
+import RPi.GPIO as gpio
+print("Successfully imported fingerprint module")
+gpio.setwarnings(False)
+gpio.setmode(gpio.BCM)
 try:
-    f = PyFingerprint('/dev/ttyUSB0', 57600, 0XFFFFFFFF, 0X00000000) 
+    f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 except Exception as e:
-    print('Exception Message :' + str(e)) 
+    print("Exception Message:", e)
+    exit(1)
 
 def enrollFinger():
-    print ('Enrolling Finger')
-    time.sleep(3)
-    print('Place Finger')
-    while(f.readImage()==False):
+    print("Enrolling Finger")
+    time.sleep(2)
+    print("Place Finger")
+    while f.readImage() == False:
         pass
-    f.convertImage(0X01)
-    result=f.searchTemplate()
+    f.convertImage(0x01)
+    result = f.searchTemplate()
     positionNumber = result[0]
-    if (positionNumber >=0):
-        print('Template already exists at position #'+str(positionNumber))
-        time.sleep(2)
+    if positionNumber >= 0:
+        print("Finger already exists at position", positionNumber)
         return
-    print('Remove finger')
-    print('Waiting for same finger')
-    time.sleep(3)
-    while(f.readImage()==False):
+    print("Remove finger")
+    time.sleep(2)
+    print("Place same finger again")
+    while f.readImage() == False:
         pass
-    f.convertImage(0X02)
-    if(f.compareCharacteristics()==0):
-        print('Fingers do not match')
-        time.sleep(2)
+    f.convertImage(0x02)
+    if f.compareCharacteristics() == 0:
+        print("Fingers do not match")
         return
-    else:
-        f.createTemplate()
-        positionNumber=f.storeTemplate()
-        print('Finger enrolled successfully')
-        print('Stored at pos: ' +str(positionNumber))
-        time.sleep(2) 
+    f.createTemplate()
+    positionNumber = f.storeTemplate()
+    print("Finger stored at position", positionNumber)
+
 def searchFinger():
     try:
-        print('Waiting for finger...')
-        time.sleep(2)
-        while(f.readImage()==False):
-            time.sleep(4)
-            return
-        f.convertImage(0X01)
+        print("Waiting for finger...")
+        while f.readImage() == False:
+            pass
+        f.convertImage(0x01)
         result = f.searchTemplate()
         positionNumber = result[0]
-        if positionNumber==-1:
-            print('No Match found')
-            time.sleep(4)
+        if positionNumber == -1:
+            print("No match found")
             return False
         else:
-            print('Found template at position ' + str(positionNumber))
-            time.sleep(4)
+            print("Found at position", positionNumber)
             return True
     except Exception as e:
-            print('Operation failed')
-            print('Exception message: ' +str(e))
-            exit(1)
-    return
+        print("Error:", e)
 
 def deleteFinger():
     try:
-        print('Waiting for finger...')
-        time.sleep(2)
-        while(f.readImage()==False):
-            	time.sleep(4)
-            	return
-        f.convertImage(0X01)
+        print("Place finger to delete")
+        while f.readImage() == False:
+            pass
+        f.convertImage(0x01)
         result = f.searchTemplate()
         positionNumber = result[0]
-        if positionNumber==-1:
-            	print('No Match found')
-            	time.sleep(4)
-            	return False
+        if positionNumber == -1:
+            print("No match found")
         else:
-	if(f.deleteTemplate(positionNumber)==True):
-            	print('Finger Deleted')
-           	
-time.sleep(4)
-            	return True
+            f.deleteTemplate(positionNumber)
+            print("Finger deleted")
     except Exception as e:
-            print('Operation failed')
-            print('Exception message: ' +str(e))
-            exit(1)
-    return
+        print("Error:", e)
 
-time.sleep(1) 
- 
-print('Start') 
+
+print("Start")
 while True:
-    	i = int(input("\nEnter :\n1.Enroll\n2.Search\n3.Delete\n4.Exit\n"));
-    	if i==1:
-        		enrollFinger()
-    	elif i==2:
-        		searchFinger()
-    	elif i==3:
-        		deleteFinger()
-    	elif i==4:
-		break
-    	else:
-        		print("Invalid option !!!Enter Correct")
-#fingerprint program ends
+    i = int(input(
+        "\n1 Enroll\n2 Search\n3 Delete\n4 Exit\nEnter: "
+    ))
+    if i == 1:
+        enrollFinger()
+    elif i == 2:
+        searchFinger()
+    elif i == 3:
+        deleteFinger()
+    elif i == 4:
+        break
+    else:
+        print("Invalid option")
